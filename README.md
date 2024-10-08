@@ -8,119 +8,101 @@ To write a program to predict the profit of a city using the linear regression m
 2. Anaconda – Python 3.7 Installation / Jupyter notebook
 
 ## Algorithm
-1.Import the required library and read the dataframe.
+Algorithm for Linear Regression Model
 
-2.Write a function computeCost to generate the cost function.
+Import Libraries: Import numpy, pandas, and StandardScaler from sklearn.preprocessing.
 
-3.Perform iterations og gradient steps with learning rate.
+Read Data: Read '50_Startups.csv' into a DataFrame (data) using pd.read_csv().
 
-4.Plot the Cost function using Gradient Descent and generate the required graph.
- 
+Data Preparation:
+
+Extract features (X) and target variable (y) from the DataFrame.
+Convert features to a numpy array (x1) and target variable to a numpy array (y).
+Scale the features using StandardScaler().
+Linear Regression Function:
+
+Define linear_regression(X1, y) function for linear regression.
+Add a column of ones to features for the intercept term.
+Initialize theta as a zero vector.
+Implement gradient descent to update theta.
+Model Training and Prediction:
+
+Call linear_regression function with scaled features (x1_scaled) and target variable (y).
+Prepare new data for prediction by scaling and reshaping.
+Use the optimized theta to predict the output for new data.
+Print Prediction:
+
+Inverse transform the scaled prediction to get the actual predicted value.
+Print the predicted value.
 
 ## Program:
 ```
+/*
 Program to implement the linear regression using gradient descent.
 Developed by: Reklies J
 RegisterNumber: 212223110041
-
+*/
 ```
-```C
-import pandas as pd
+Linear Regression Function
+```
 import numpy as np
-import matplotlib.pyplot as plt
-data=pd.read_csv("ex1.txt",header=None)
-plt.scatter(data[0],data[1])
-plt.xticks(np.arange(5,30,step=5))
-plt.yticks(np.arange(-5,30,step=5))
-plt.xlabel("Population of City(10,000s)")
-plt.ylabel("Profit ($10,000)")
-plt.title("Profit Prediction")
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
+def linear_regression(X1,y,learning_rate=0.1,num_iters=1000):
+    X=np.c_[np.ones(len(X1)),X1]
 
-def computeCost(X,y,theta):
-    m=len(y) 
-    h=X.dot(theta) 
-    square_err=(h-y)**2
-    return 1/(2*m)*np.sum(square_err) 
+    theta=np.zeros(X.shape[1]).reshape(-1,1)
 
-data_n=data.values
-m=data_n[:,0].size
-X=np.append(np.ones((m,1)),data_n[:,0].reshape(m,1),axis=1)
-y=data_n[:,1].reshape(m,1)
-theta=np.zeros((2,1))
-computeCost(X,y,theta) 
+    for _ in range(num_iters):
+        #calculate predictions
+        predictions=(X).dot(theta).reshape(-1,1)
 
-def gradientDescent(X,y,theta,alpha,num_iters):
-    m=len(y)
-    J_history=[] #empty list
-    for i in range(num_iters):
-        predictions=X.dot(theta)
-        error=np.dot(X.transpose(),(predictions-y))
-        descent=alpha*(1/m)*error
-        theta-=descent
-        J_history.append(computeCost(X,y,theta))
-    return theta,J_history
-
-theta,J_history = gradientDescent(X,y,theta,0.01,1500)
-print("h(x) ="+str(round(theta[0,0],2))+" + "+str(round(theta[1,0],2))+"x1")
-
-plt.plot(J_history)
-plt.xlabel("Iteration")
-plt.ylabel("$J(\Theta)$")
-plt.title("Cost function using Gradient Descent")
-
-plt.scatter(data[0],data[1])
-x_value=[x for x in range(25)]
-y_value=[y*theta[1]+theta[0] for y in x_value]
-plt.plot(x_value,y_value,color="r")
-plt.xticks(np.arange(5,30,step=5))
-plt.yticks(np.arange(-5,30,step=5))
-plt.xlabel("Population of City(10,000s)")
-plt.ylabel("Profit ($10,000)")
-plt.title("Profit Prediction")
-
-def predict(x,theta):
-    predictions=np.dot(theta.transpose(),x)
-    return predictions[0]
-
-predict1=predict(np.array([1,3.5]),theta)*10000
-print("For Population = 35000, we predict a profit of $"+str(round(predict1,0)))
-
-predict2=predict(np.array([1,7]),theta)*10000
-print("For Population = 70000, we predict a profit of $"+str(round(predict2,0)))
-
+        #calculate errors
+        errors=(predictions-y).reshape(-1,1)
+        #Update theta using gradient descent
+        theta-=learning_rate*(1/len(X1))*X.T.dot(errors)
+    return theta
 ```
+Read Data
+```
+data=pd.read_csv("/content/50_Startups.csv")
+data.head()
+```
+Scaling
+```
+x=(data.iloc[1:,:-2].values)
+x1=x.astype(float)
+
+scaler=StandardScaler()
+y=(data.iloc[1:,-1].values).reshape(-1,1)
+x1_scaled=scaler.fit_transform(x1)
+y1_scaled=scaler.fit_transform(y)
+print(x)
+print(x1_scaled)
+```
+Predicting
+```
+theta=linear_regression(x1_scaled,y1_scaled)
+new_data=np.array([165349.2,136897.8,471784.1]).reshape(-1,1)
+new_scaled=scaler.fit_transform(new_data)
+prediction=np.dot(np.append(1,new_scaled),theta)
+prediction=prediction.reshape(-1,1)
+pre=scaler.inverse_transform(prediction)
+print(prediction)
+print(f"Predicted valeue: {pre}")
+```
+
+
 ## Output:
- Profit prediction:
+![1ML](https://github.com/rohithprem18/Implementation-of-Linear-Regression-Using-Gradient-Descent/assets/146315115/9bf60fa0-af77-42cf-a31d-ea158d181abb)
 
-![download](https://github.com/charumathiramesh/Implementation-of-Linear-Regression-Using-Gradient-Descent/assets/120204455/72c751de-9d20-419c-908d-f9d68e91d28e)
+![2ML](https://github.com/rohithprem18/Implementation-of-Linear-Regression-Using-Gradient-Descent/assets/146315115/3be61adc-d7e3-4d8c-97b4-3e0ac9547133)
 
-Function:
+![3ML](https://github.com/rohithprem18/Implementation-of-Linear-Regression-Using-Gradient-Descent/assets/146315115/c0b84bd5-3d9e-45f2-8f24-7908acecff74)
 
-![function](https://github.com/charumathiramesh/Implementation-of-Linear-Regression-Using-Gradient-Descent/assets/120204455/5440dbe0-743e-4f21-9b15-c6750af2f4e1)
+![4ML](https://github.com/rohithprem18/Implementation-of-Linear-Regression-Using-Gradient-Descent/assets/146315115/9d167518-03cc-4e2c-b206-93ac4cf31ba6)
 
-GRADIENT DESCENT:
-
-![gradient ](https://github.com/charumathiramesh/Implementation-of-Linear-Regression-Using-Gradient-Descent/assets/120204455/aef30837-1496-469f-97f8-2a7a64ca63b7)
-
-
-COST FUNCTION USING GRADIENT DESCENT:
-
-![download](https://github.com/charumathiramesh/Implementation-of-Linear-Regression-Using-Gradient-Descent/assets/120204455/17ee5b6b-631f-475a-9c3f-4e0a5e3a7b2e)
-
-
-LINEAR REGRESSION USING PROFIT PREDICTION:
-
-![download](https://github.com/charumathiramesh/Implementation-of-Linear-Regression-Using-Gradient-Descent/assets/120204455/59d451d6-9bc7-4a74-aca4-e5c6e1790efb)
-
-
-PROFIT PREDICTION FOR A POPULATION OF 35000:
-
-![267988692-43f982a1-bbcc-4910-9ef0-794ff2421d33](https://github.com/charumathiramesh/Implementation-of-Linear-Regression-Using-Gradient-Descent/assets/120204455/024ca885-488e-400f-a698-300882d60a1a)
-
-
-##PROFIT PREDICTION FOR A POPULATION OF 70000:
-
-![267988729-f1cf50b4-0a6e-4d34-bb8f-683c9b6923ab](https://github.com/charumathiramesh/Implementation-of-Linear-Regression-Using-Gradient-Descent/assets/120204455/b1150597-9c47-4e21-874e-7714e24aad18)
+![5ML](https://github.com/rohithprem18/Implementation-of-Linear-Regression-Using-Gradient-Descent/assets/146315115/9c78ef45-c44a-4873-8ff1-262becf88045)
 
 
 
